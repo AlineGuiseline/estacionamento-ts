@@ -1,10 +1,20 @@
-"use strict";
 (function () {
-    const $ = (query) => document.querySelector(query); // pra não precisar ficar criando querySelector para tudo
+    const $ = (query) => document.querySelector(query); // para não precisar ficar criando querySelector 
+    // para tudo
+    function calcTempo(mil) {
+        const min = Math.floor(mil / 60000);
+        const sec = Math.floor((mil % 60000) / 1000);
+        return `${min}m e ${sec}s`;
+    }
     function patio() {
-        function ler() { }
-        function adicionar(veiculo) {
-            var _a;
+        function ler() {
+            return localStorage.patio ? JSON.parse(localStorage.patio) : [];
+        }
+        function salvar(veiculos) {
+            localStorage.setItem("patio", JSON.stringify(veiculos));
+        }
+        function adicionar(veiculo, salva) {
+            var _a, _b;
             const row = document.createElement("tr");
             row.innerHTML = `
                 <td>${veiculo.nome}</td>
@@ -14,13 +24,34 @@
                     <button class="delete" data-placa="${veiculo.placa}">X</button>
                 </td>
             `;
-            (_a = $("#patio")) === null || _a === void 0 ? void 0 : _a.appendChild(row);
+            (_a = row.querySelector(".delete")) === null || _a === void 0 ? void 0 : _a.addEventListener("click", function () {
+                remover(this.dataset.placa);
+            });
+            (_b = $("#patio")) === null || _b === void 0 ? void 0 : _b.appendChild(row);
+            if (salva)
+                salvar([...ler(), veiculo]);
         }
-        function remover() { }
-        function salvar() { }
-        function renderizar() { }
+        function remover(placa) {
+            const { entrada, nome } = ler().find(veiculo => veiculo.placa === placa);
+            const tempo = calcTempo(new Date().getTime() - new Date(entrada).getTime());
+            if (!confirm(`O veículo ${nome} permaneceu por ${tempo}. Deseja encerrar?`))
+                return;
+            salvar(ler().filter(veiculo => veiculo.placa !== placa));
+            renderizar();
+        }
+        function renderizar() {
+            $("#patio").innerHTML = "";
+            // o ! se chama "force". Como eu tenho certeza de que "patio" existe no
+            // HTML, estou forçando o innerHTML a renderizá-lo sempre (é perigoso usar
+            // o force. Use com moderação)
+            const patio = ler();
+            if (patio.length) {
+                patio.forEach(veiculo => adicionar(veiculo));
+            }
+        }
         return { ler, adicionar, remover, salvar, renderizar };
     }
+    patio().renderizar();
     const btnCadastrar = $("#cadastrar");
     if (btnCadastrar) {
         btnCadastrar.addEventListener("click", () => {
@@ -31,7 +62,7 @@
                 alert("Os campos nome e placa são obrigatórios");
                 return;
             }
-            patio().adicionar({ nome, placa, entrada: new Date() });
+            patio().adicionar({ nome, placa, entrada: new Date().toISOString() }, true);
         });
     }
     else {
