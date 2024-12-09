@@ -45,7 +45,7 @@
             if (!veiculo)
                 return;
             const tempo = calcTempo(new Date().getTime() - new Date(veiculo.entrada).getTime());
-            if (!confirm(`O veículo ${veiculo.nome} permaneceu por ${tempo}. Deseja encerrar?`))
+            if (!confirm(`O veículo ${veiculo.placa} de ${veiculo.nome} permaneceu por ${tempo}. Deseja encerrar?`))
                 return;
             salvar(ler().filter((veiculo) => veiculo.placa !== placa));
             renderizar();
@@ -66,15 +66,23 @@
     const btnCadastrar = $("#cadastrar");
     if (btnCadastrar) {
         btnCadastrar.addEventListener("click", () => {
-            var _a, _b;
-            const nome = (_a = $("#nome")) === null || _a === void 0 ? void 0 : _a.value;
-            const placa = (_b = $("#placa")) === null || _b === void 0 ? void 0 : _b.value;
+            /*             const nome = $("#nome")?.value;
+                        const placa = $("#placa")?.value; */
+            const nomeInput = $("#nome");
+            const placaInput = $("#placa");
+            const nome = nomeInput === null || nomeInput === void 0 ? void 0 : nomeInput.value;
+            const placa = placaInput === null || placaInput === void 0 ? void 0 : placaInput.value;
             if (!nome || !placa) {
                 alert("Os campos nome e placa são obrigatórios");
                 return;
             }
             const entrada = new Date().toISOString(); // Armazena no formato ISO
             patio().adicionar({ nome, placa, entrada }, true);
+            // limpa os nomes dos inputs
+            if (nomeInput)
+                nomeInput.value = "";
+            if (placaInput)
+                placaInput.value = "";
         });
     }
     else {

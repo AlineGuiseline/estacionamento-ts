@@ -63,7 +63,7 @@ interface Veiculo {
 
             const tempo = calcTempo(new Date().getTime() - new Date(veiculo.entrada).getTime());
 
-            if (!confirm(`O veículo ${veiculo.nome} permaneceu por ${tempo}. Deseja encerrar?`)) return;
+            if (!confirm(`O veículo ${veiculo.placa} de ${veiculo.nome} permaneceu por ${tempo}. Deseja encerrar?`)) return;
 
             salvar(ler().filter((veiculo) => veiculo.placa !== placa));
 
@@ -91,8 +91,14 @@ interface Veiculo {
 
     if (btnCadastrar) {
         btnCadastrar.addEventListener("click", () => {
-            const nome = $("#nome")?.value;
-            const placa = $("#placa")?.value;
+/*             const nome = $("#nome")?.value;
+            const placa = $("#placa")?.value; */
+
+            const nomeInput = $("#nome");
+            const placaInput = $("#placa");
+
+            const nome = nomeInput?.value;
+            const placa = placaInput?.value;
 
             if (!nome || !placa) {
                 alert("Os campos nome e placa são obrigatórios");
@@ -102,6 +108,10 @@ interface Veiculo {
             const entrada = new Date().toISOString(); // Armazena no formato ISO
 
             patio().adicionar({ nome, placa, entrada }, true);
+
+            // limpa os nomes dos inputs
+            if (nomeInput) nomeInput.value = "";
+            if (placaInput) placaInput.value = "";
         });
     } else {
         console.error("Botão não encontrado! Verifique o ID.");
