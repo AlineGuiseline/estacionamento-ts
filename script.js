@@ -16,10 +16,19 @@
         function adicionar(veiculo, salva) {
             var _a, _b;
             const row = document.createElement("tr");
+            // Formatar a data para exibição no HTML
+            const entradaFormatada = new Date(veiculo.entrada).toLocaleString('pt-BR', {
+                year: '2-digit',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+            });
             row.innerHTML = `
                 <td>${veiculo.nome}</td>
                 <td>${veiculo.placa}</td>
-                <td>${veiculo.entrada}</td>
+                <td>${entradaFormatada}</td>
                 <td>
                     <button class="delete" data-placa="${veiculo.placa}">X</button>
                 </td>
@@ -32,11 +41,13 @@
                 salvar([...ler(), veiculo]);
         }
         function remover(placa) {
-            const { entrada, nome } = ler().find(veiculo => veiculo.placa === placa);
-            const tempo = calcTempo(new Date().getTime() - new Date(entrada).getTime());
-            if (!confirm(`O veículo ${nome} permaneceu por ${tempo}. Deseja encerrar?`))
+            const veiculo = ler().find((veiculo) => veiculo.placa === placa);
+            if (!veiculo)
                 return;
-            salvar(ler().filter(veiculo => veiculo.placa !== placa));
+            const tempo = calcTempo(new Date().getTime() - new Date(veiculo.entrada).getTime());
+            if (!confirm(`O veículo ${veiculo.nome} permaneceu por ${tempo}. Deseja encerrar?`))
+                return;
+            salvar(ler().filter((veiculo) => veiculo.placa !== placa));
             renderizar();
         }
         function renderizar() {
@@ -46,7 +57,7 @@
             // o force. Use com moderação)
             const patio = ler();
             if (patio.length) {
-                patio.forEach(veiculo => adicionar(veiculo));
+                patio.forEach((veiculo) => adicionar(veiculo));
             }
         }
         return { ler, adicionar, remover, salvar, renderizar };
@@ -62,7 +73,8 @@
                 alert("Os campos nome e placa são obrigatórios");
                 return;
             }
-            patio().adicionar({ nome, placa, entrada: new Date().toISOString() }, true);
+            const entrada = new Date().toISOString(); // Armazena no formato ISO
+            patio().adicionar({ nome, placa, entrada }, true);
         });
     }
     else {
